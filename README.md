@@ -1,70 +1,69 @@
-# Getting Started with Create React App
+CRM para Loja de Roupas
+Um sistema de CRM (Customer Relationship Management) completo e responsivo, desenvolvido em React, para gerenciar clientes, vendas e automatizar o relacionamento com o cliente em uma loja de roupas. A aplicação é projetada para ser intuitiva, eficiente e adaptável a qualquer tamanho de tela.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+✨ Funcionalidades Principais
+O sistema é dividido em quatro módulos principais, acessíveis através de uma navegação por abas:
 
-## Available Scripts
+Clientes: Gestão completa da base de clientes.
 
-In the project directory, you can run:
+Vendas: Registro e acompanhamento de todas as vendas.
 
-### `npm start`
+Tarefas: Central de ações de relacionamento, geradas automaticamente.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Automação: Motor para criar regras personalizadas de engajamento.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+👤 Gestão de Clientes
+Nesta aba, você pode gerenciar todas as informações dos seus clientes de forma centralizada.
 
-### `npm test`
+Cadastro e Edição: Adicione novos clientes ou atualize informações existentes através de um formulário intuitivo, incluindo nome, telefone, e-mail, data de nascimento e observações.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Listagem e Busca: Visualize todos os clientes em uma tabela organizada. Utilize a barra de busca para encontrar clientes rapidamente pelo nome ou telefone.
 
-### `npm run build`
+Exclusão Segura: Remova clientes da base. Ao excluir um cliente, todas as suas vendas e tarefas associadas também são removidas para manter a integridade dos dados.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+🛒 Gestão de Vendas
+Registre cada transação para manter um histórico completo do relacionamento comercial.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Registro de Vendas: Crie um novo registro de venda associando-o a um cliente existente, com data, valor e descrição.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Crédito ao Cliente: Adicione um valor de crédito para o cliente como parte de uma venda (ex: cashback, trocas) e defina uma data de validade para o mesmo.
 
-### `npm run eject`
+Histórico Completo: Todas as vendas são listadas em ordem cronológica, facilitando a consulta.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+✅ Sistema de Tarefas Automatizadas
+O coração do relacionamento com o cliente. Esta aba organiza todas as ações de contato que precisam ser feitas.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Geração Automática: As tarefas são criadas automaticamente com base nas regras definidas na aba "Automação".
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Filtros Inteligentes: Organize as tarefas por status: Atrasadas, Hoje, Futuras e Concluídas.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Envio de WhatsApp: Cada tarefa pendente possui um botão "Enviar WhatsApp" que abre o WhatsApp Web com o número do cliente e a mensagem personalizada já preenchida, otimizando o tempo.
 
-## Learn More
+Status Visual: As tarefas possuem indicadores visuais de status e tipo (Aniversário, Crédito, Inatividade).
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+⚙️ Motor de Automação
+Configure as regras que darão vida ao seu CRM. Crie gatilhos para que o sistema trabalhe para você.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Criação de Regras: Defina novas regras de automação para três tipos de gatilhos:
 
-### Code Splitting
+Aniversário: Envia lembretes X dias antes do aniversário do cliente.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Crédito: Avisa o cliente sobre um crédito que está prestes a expirar.
 
-### Analyzing the Bundle Size
+Inatividade: Entra em contato com clientes que não compram há um determinado período.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Mensagens Personalizadas: Utilize variáveis dinâmicas como {nome}, {credito} e {dataExpiracao} nas mensagens para criar uma comunicação única e pessoal com cada cliente.
 
-### Making a Progressive Web App
+Gerenciamento de Regras: Edite, ative/desative ou exclua regras a qualquer momento.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+🚀 Tecnologias Utilizadas
+React: Biblioteca JavaScript para a construção da interface de usuário.
 
-### Advanced Configuration
+React Hooks (useState, useEffect): Para gerenciamento de estado e ciclo de vida dos componentes.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Tailwind CSS: Framework CSS para estilização rápida e responsiva.
 
-### Deployment
+Lucide React: Biblioteca de ícones open-source, leve e personalizável.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+📱 Design Responsivo
+A aplicação foi desenvolvida com a abordagem mobile-first, garantindo uma experiência de uso perfeita em qualquer dispositivo, seja em um celular, tablet ou desktop. Elementos como tabelas, formulários e a navegação se adaptam de forma inteligente ao tamanho da tela.
