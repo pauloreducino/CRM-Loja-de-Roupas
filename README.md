@@ -1,7 +1,3 @@
-Com certeza\! Transformar a descrição do seu projeto em uma documentação `README.md` clara e profissional é fundamental para qualquer repositório. Abaixo está uma versão otimizada, pronta para ser copiada e colada, incluindo as seções que você solicitou sobre como instalar e rodar o projeto.
-
----
-
 # CRM para Loja de Roupas
 
 Um sistema de CRM (Customer Relationship Management) completo e responsivo, desenvolvido em React, para gerenciar clientes, vendas e automatizar o relacionamento com o cliente em uma loja de roupas. A aplicação é projetada para ser intuitiva, eficiente e adaptável a qualquer tamanho de tela.
