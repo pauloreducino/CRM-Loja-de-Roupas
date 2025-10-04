@@ -281,13 +281,21 @@ const CRMLoja = () => {
   const closeModal = () => setShowModal(false);
 
   const saveCliente = (data) => {
-    if (editingItem)
+    if (editingItem) {
       setClientes(
         clientes.map((c) =>
           c.id === editingItem.id ? { ...data, id: editingItem.id } : c
         )
       );
-    else setClientes([...clientes, { ...data, id: Date.now() }]);
+      // Atualiza o nome do cliente em todas as tarefas relacionadas
+      setTarefas(
+        tarefas.map((t) =>
+          t.clienteId === editingItem.id
+            ? { ...t, clienteNome: data.nome, telefone: data.telefone }
+            : t
+        )
+      );
+    } else setClientes([...clientes, { ...data, id: Date.now() }]);
     closeModal();
   };
 
