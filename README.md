@@ -2,19 +2,24 @@
 
 Um sistema de CRM (Customer Relationship Management) completo e responsivo, desenvolvido em React, para gerenciar clientes, vendas e automatizar o relacionamento com o cliente em uma loja de roupas. A aplicação é projetada para ser intuitiva, eficiente e adaptável a qualquer tamanho de tela.
 
-## 📋 Índice
+## 📌 Índice
 
 - [Sobre o Projeto](#sobre-o-projeto)
+
 - [Funcionalidades Principais](#-funcionalidades-principais)
 
   - [Gestão de Clientes](#-gestão-de-clientes)
   - [Gestão de Vendas](#-gestão-de-vendas)
   - [Sistema de Tarefas Automatizadas](#-sistema-de-tarefas-automatizadas)
   - [Motor de Automação](#-motor-de-automação)
+  - [Personalização Visual](#-personalização-visual)
 
 - [Design Responsivo](#-design-responsivo)
+
 - [Telas da Aplicação](#-telas-da-aplicação)
+
 - [Tecnologias Utilizadas](#-tecnologias-utilizadas)
+
 - [Começando](#-começando)
 
   - [Pré-requisitos](#pré-requisitos)
@@ -62,6 +67,15 @@ Configure as regras que darão vida ao seu CRM.
 - **Criação de Regras:** Defina gatilhos para três tipos de eventos: Aniversário, Crédito Expirando e Inatividade de Cliente.
 - **Mensagens Personalizadas:** Utilize variáveis dinâmicas como `{nome}`, `{credito}` e `{dataExpiracao}` para criar uma comunicação única.
 - **Gerenciamento de Regras:** Edite, ative, desative ou exclua regras a qualquer momento.
+
+### 🎨 Personalização Visual
+
+Agora você pode personalizar o **gradiente do header** do CRM, deixando o sistema com a identidade visual da sua loja:
+
+- **Seleção de Gradiente:** Escolha duas cores livremente (cor inicial e cor final) para criar seu próprio gradiente.
+- **Aplicação em Tempo Real:** Ao selecionar as cores, o header é atualizado imediatamente.
+- **Persistência de Configuração:** As cores escolhidas são salvas automaticamente no `localStorage` do navegador, garantindo que o gradiente permaneça mesmo após recarregar a página.
+- **Acessível e Responsivo:** O botão para abrir a paleta de cores está disponível tanto em desktop quanto mobile, sempre no canto superior direito.
 
 ## 📱 Design Responsivo
 
