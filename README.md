@@ -1,19 +1,4 @@
-Ok, ok\! Entendido. Sem mais delongas.
-
-Para garantir que a mensagem não seja bloqueada por ser muito longa (o que parece ser o nosso bug), vou enviar a versão final completa em **3 PARTES**, aqui mesmo.
-
-É só copiar e colar uma parte após a outra no seu arquivo.
-
----
-
-### **PARTE 1 de 3**
-
-```markdown
 # CRM para Loja de Roupas
-
-![Licença](https://img.shields.io/badge/licença-MIT-blue.svg)
-![React](https://img.shields.io/badge/React-18.2.0-61DAFB?logo=react)
-![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.4.1-38B2AC?logo=tailwind-css)
 
 Um sistema de CRM (Customer Relationship Management) completo e responsivo, desenvolvido em React, para gerenciar clientes, vendas e automatizar o relacionamento com o cliente em uma loja de roupas. A aplicação é projetada para ser intuitiva, eficiente e adaptável a qualquer tamanho de tela.
 
@@ -21,12 +6,20 @@ Um sistema de CRM (Customer Relationship Management) completo e responsivo, dese
 
 - [Sobre o Projeto](#sobre-o-projeto)
 - [Funcionalidades Principais](#-funcionalidades-principais)
+
+  - [Gestão de Clientes](#-gestão-de-clientes)
+  - [Gestão de Vendas](#-gestão-de-vendas)
+  - [Sistema de Tarefas Automatizadas](#-sistema-de-tarefas-automatizadas)
+  - [Motor de Automação](#-motor-de-automação)
+
 - [Design Responsivo](#-design-responsivo)
 - [Telas da Aplicação](#-telas-da-aplicação)
 - [Tecnologias Utilizadas](#-tecnologias-utilizadas)
 - [Começando](#-começando)
+
   - [Pré-requisitos](#pré-requisitos)
   - [Instalação](#instalação)
+
 - [Licença](#-licença)
 
 ## Sobre o Projeto
@@ -37,100 +30,111 @@ Este CRM foi criado para simplificar a gestão de uma loja de roupas, focando no
 
 O sistema é dividido em quatro módulos principais, acessíveis através de uma navegação por abas:
 
-#### 👤 **Gestão de Clientes**
+### 👤 Gestão de Clientes
 
-- **Cadastro e Edição:** Adicione novos clientes ou atualize informações existentes através de um formulário intuitivo.
-- **Listagem e Busca:** Visualize todos os clientes em uma tabela organizada e utilize a busca para encontrar clientes rapidamente.
+Gestão completa da base de clientes.
+
+- **Cadastro e Edição:** Adicione novos clientes ou atualize informações existentes através de um formulário intuitivo (nome, telefone, e-mail, data de nascimento e observações).
+- **Listagem e Busca:** Visualize todos os clientes em uma tabela organizada e utilize a barra de busca para encontrar clientes rapidamente.
 - **Exclusão Segura:** Remova clientes da base. Todas as vendas e tarefas associadas são removidas para manter a integridade dos dados.
-```
 
----
+### 🛒 Gestão de Vendas
 
-### **PARTE 2 de 3**
-
-```markdown
-#### 🛒 **Gestão de Vendas**
+Registre cada transação para manter um histórico completo.
 
 - **Registro de Vendas:** Crie um novo registro de venda associado a um cliente existente, com data, valor e descrição.
 - **Crédito ao Cliente:** Adicione um valor de crédito para o cliente (ex: cashback, trocas) e defina uma data de validade.
 - **Histórico Completo:** Todas as vendas são listadas em ordem cronológica para fácil consulta.
 
-#### ✅ **Sistema de Tarefas Automatizadas**
+### ✅ Sistema de Tarefas Automatizadas
+
+O coração do relacionamento com o cliente, organizando todas as ações de contato.
 
 - **Geração Automática:** As tarefas são criadas com base nas regras definidas na aba "Automação".
 - **Filtros Inteligentes:** Organize as tarefas por status: Atrasadas, Hoje, Futuras e Concluídas.
-- **Envio de WhatsApp:** Um botão abre o WhatsApp Web com o número do cliente e a mensagem personalizada já preenchida.
+- **Envio de WhatsApp:** Um botão "Enviar WhatsApp" abre o WhatsApp Web com o número do cliente e a mensagem personalizada já preenchida.
+- **Status Visual:** Indicadores visuais de status e tipo (Aniversário, Crédito, Inatividade).
 
-#### ⚙️ **Motor de Automação**
+### ⚙️ Motor de Automação
+
+Configure as regras que darão vida ao seu CRM.
 
 - **Criação de Regras:** Defina gatilhos para três tipos de eventos: Aniversário, Crédito Expirando e Inatividade de Cliente.
-- **Mensagens Personalizadas:** Utilize variáveis dinâmicas como `{nome}` e `{credito}` para criar uma comunicação única.
+- **Mensagens Personalizadas:** Utilize variáveis dinâmicas como `{nome}`, `{credito}` e `{dataExpiracao}` para criar uma comunicação única.
 - **Gerenciamento de Regras:** Edite, ative, desative ou exclua regras a qualquer momento.
 
 ## 📱 Design Responsivo
 
-Desenvolvido com a abordagem **mobile-first**, garantindo uma experiência de uso perfeita em qualquer dispositivo.
+Desenvolvido com a abordagem **mobile-first**, garantindo uma experiência de uso perfeita em qualquer dispositivo, seja em um celular, tablet ou desktop. Elementos como tabelas, formulários e a navegação se adaptam de forma inteligente ao tamanho da tela.
 
 ## 📸 Telas da Aplicação
 
+_(Aqui você pode adicionar imagens ou GIFs demonstrando a interface do CRM.)_
+
 ## 🚀 Tecnologias Utilizadas
 
-- **React:** Biblioteca JavaScript para a construção da interface de usuário.
-- **React Hooks (useState, useEffect):** Para gerenciamento de estado e ciclo de vida.
-- **Tailwind CSS:** Framework CSS para estilização rápida e responsiva.
-- **Lucide React:** Biblioteca de ícones open-source e personalizável.
-```
+- **[React](https://reactjs.org/):** Biblioteca JavaScript para a construção da interface de usuário.
+- **[React Hooks (useState, useEffect)](https://reactjs.org/docs/hooks-intro.html):** Para gerenciamento de estado e ciclo de vida dos componentes.
+- **[Tailwind CSS](https://tailwindcss.com/):** Framework CSS para estilização rápida e responsiva.
+- **[Lucide React](https://lucide.dev/):** Biblioteca de ícones open-source, leve e personalizável.
 
----
-
-### **PARTE 3 de 3**
-
-````markdown
 ## 🏁 Começando
 
-Siga estas instruções para obter uma cópia do projeto em funcionamento na sua máquina local.
+Siga estas instruções para obter uma cópia do projeto em funcionamento na sua máquina local para desenvolvimento e testes.
 
 ### Pré-requisitos
 
-Antes de começar, você precisará ter as seguintes ferramentas instaladas:
+Antes de começar, você precisará ter as seguintes ferramentas instaladas em sua máquina:
 
-- [Node.js](https://nodejs.org/en/) (que inclui o npm)
+- [Node.js](https://nodejs.org/en/) (que inclui o npm, gerenciador de pacotes)
 - [Git](https://git-scm.com/)
 
 ### Instalação
 
-1.  **Clone o repositório**
+1. **Clone o repositório**
 
-    ```sh
-    git clone [https://github.com/seu-usuario/nome-do-repositorio.git](https://github.com/seu-usuario/nome-do-repositorio.git)
-    ```
+```sh
+git clone https://github.com/seu-usuario/nome-do-repositorio.git
+```
 
-    2.  **Navegue até o diretório do projeto**
+2. **Navegue até o diretório do projeto**
 
-    ```sh
-    cd nome-do-repositorio
-    ```
+```sh
+cd nome-do-repositorio
+```
 
-2.  **Instale as dependências**
+3. **Instale as dependências**
 
-    ```sh
-    npm install
-    ```
+```sh
+npm install
+```
 
-3.  **Execute a aplicação**
+_ou, se você utilizar Yarn:_
 
-    ```sh
-    npm start
-    ```
+```sh
+yarn install
+```
 
-4.  **Abra no navegador**
-    A aplicação estará disponível em `http://localhost:3000`.
+4. **Execute a aplicação**
+
+```sh
+npm start
+```
+
+_ou, se você utilizar Yarn:_
+
+```sh
+yarn start
+```
+
+5. **Abra no navegador**
+
+A aplicação estará disponível em [http://localhost:3000](http://localhost:3000).
 
 ## 📄 Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE.md](LICENSE.md) para mais detalhes.
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE.md) para mais detalhes.
 
 ---
 
 Feito com ❤️ por [Paulo Reducino](https://github.com/pauloreducino)
-````
