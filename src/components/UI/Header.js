@@ -58,7 +58,7 @@ const Header = ({ onLogout }) => {
             </p>
             <div className="flex flex-col gap-3">
               <div className="flex flex-col">
-                <label className="text-white text-sm mb-1">Cor Inicial</label>
+                <label className="text-black text-sm mb-1">Cor Inicial</label>
                 <input
                   type="color"
                   value={startColor}
@@ -67,7 +67,7 @@ const Header = ({ onLogout }) => {
                 />
               </div>
               <div className="flex flex-col">
-                <label className="text-white text-sm mb-1">Cor Final</label>
+                <label className="text-black text-sm mb-1">Cor Final</label>
                 <input
                   type="color"
                   value={endColor}

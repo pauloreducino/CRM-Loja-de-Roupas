@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -19,89 +21,75 @@ const registerSchema = z
 
 const Auth = ({ onLogin }) => {
   const [modo, setModo] = useState("login");
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [confirmarSenha, setConfirmarSenha] = useState("");
-  const [erro, setErro] = useState("");
-  const [sucesso, setSucesso] = useState("");
+  const [mensagem, setMensagem] = useState({ erro: "", sucesso: "" });
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    setErro("");
+  const loginForm = useForm({
+    resolver: zodResolver(loginSchema),
+  });
 
-    try {
-      loginSchema.parse({ email, senha });
+  const registerForm = useForm({
+    resolver: zodResolver(registerSchema),
+  });
 
-      const usuarios = JSON.parse(localStorage.getItem("crm_usuarios")) || [];
-      const usuario = usuarios.find(
-        (u) => u.email === email && u.senha === senha
-      );
+  const resetForm = useForm({
+    resolver: zodResolver(
+      z.object({ email: z.string().email("E-mail inválido") })
+    ),
+  });
 
-      if (usuario) {
-        localStorage.setItem("crm_usuario_logado", JSON.stringify(usuario));
-        onLogin(usuario);
-      } else {
-        setErro("E-mail ou senha incorretos");
-      }
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        setErro(err.errors[0].message);
-      }
+  const onLoginHandler = (data) => {
+    setMensagem({ erro: "", sucesso: "" });
+    const usuarios = JSON.parse(localStorage.getItem("crm_usuarios") || "[]");
+    const usuario = usuarios.find(
+      (u) => u.email === data.email && u.senha === data.senha
+    );
+
+    if (usuario) {
+      localStorage.setItem("crm_usuario_logado", JSON.stringify(usuario));
+      onLogin(usuario);
+    } else {
+      setMensagem({ erro: "E-mail ou senha incorretos" });
     }
   };
 
-  const handleRegistro = (e) => {
-    e.preventDefault();
-    setErro("");
-    setSucesso("");
+  const onRegisterHandler = (data) => {
+    setMensagem({ erro: "", sucesso: "" });
+    const usuarios = JSON.parse(localStorage.getItem("crm_usuarios") || "[]");
+    const usuarioExiste = usuarios.find((u) => u.email === data.email);
 
-    try {
-      registerSchema.parse({ email, senha, confirmarSenha });
-
-      const usuarios = JSON.parse(localStorage.getItem("crm_usuarios")) || [];
-      const usuarioExiste = usuarios.find((u) => u.email === email);
-
-      if (usuarioExiste) {
-        setErro("Este e-mail já está cadastrado");
-        return;
-      }
-
-      const novoUsuario = { id: Date.now(), email, senha };
-      usuarios.push(novoUsuario);
-      localStorage.setItem("crm_usuarios", JSON.stringify(usuarios));
-
-      setSucesso("Cadastro realizado com sucesso! Faça login.");
-      setModo("login");
-      setSenha("");
-      setConfirmarSenha("");
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        setErro(err.errors[0].message);
-      }
-    }
-  };
-
-  const handleReset = (e) => {
-    e.preventDefault();
-    setErro("");
-    setSucesso("");
-
-    if (!email || !z.string().email().safeParse(email).success) {
-      setErro("Digite um e-mail válido");
+    if (usuarioExiste) {
+      setMensagem({ erro: "Este e-mail já está cadastrado" });
       return;
     }
 
-    const usuarios = JSON.parse(localStorage.getItem("crm_usuarios")) || [];
-    const usuario = usuarios.find((u) => u.email === email);
+    const novoUsuario = {
+      id: Date.now(),
+      email: data.email,
+      senha: data.senha,
+    };
+    usuarios.push(novoUsuario);
+    localStorage.setItem("crm_usuarios", JSON.stringify(usuarios));
+    setMensagem({ sucesso: "Cadastro realizado com sucesso! Faça login." });
+    setModo("login");
+    registerForm.reset();
+  };
+
+  const onResetHandler = (data) => {
+    setMensagem({ erro: "", sucesso: "" });
+    const usuarios = JSON.parse(localStorage.getItem("crm_usuarios") || "[]");
+    const usuario = usuarios.find((u) => u.email === data.email);
 
     if (usuario) {
-      setSucesso(`Instruções de recuperação foram enviadas para ${email}`);
+      setMensagem({
+        sucesso: `Instruções de recuperação foram enviadas para ${data.email}`,
+      });
       setTimeout(() => {
         setModo("login");
-        setSucesso("");
+        setMensagem({ erro: "", sucesso: "" });
       }, 3000);
+      resetForm.reset();
     } else {
-      setErro("E-mail não encontrado");
+      setMensagem({ erro: "E-mail não encontrado" });
     }
   };
 
@@ -129,8 +117,7 @@ const Auth = ({ onLogin }) => {
             <button
               onClick={() => {
                 setModo("login");
-                setErro("");
-                setSucesso("");
+                setMensagem({ erro: "", sucesso: "" });
               }}
               className={`flex-1 pb-3 text-center font-medium transition-colors ${
                 modo === "login"
@@ -143,8 +130,7 @@ const Auth = ({ onLogin }) => {
             <button
               onClick={() => {
                 setModo("registro");
-                setErro("");
-                setSucesso("");
+                setMensagem({ erro: "", sucesso: "" });
               }}
               className={`flex-1 pb-3 text-center font-medium transition-colors ${
                 modo === "registro"
@@ -156,32 +142,37 @@ const Auth = ({ onLogin }) => {
             </button>
           </div>
 
-          {erro && (
+          {mensagem.erro && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
-              {erro}
+              {mensagem.erro}
             </div>
           )}
-
-          {sucesso && (
+          {mensagem.sucesso && (
             <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4">
-              {sucesso}
+              {mensagem.sucesso}
             </div>
           )}
 
           {modo === "login" && (
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form
+              onSubmit={loginForm.handleSubmit(onLoginHandler)}
+              className="space-y-4"
+            >
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   E-mail
                 </label>
                 <input
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  {...loginForm.register("email")}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="seu@email.com"
-                  required
                 />
+                {loginForm.formState.errors.email && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {loginForm.formState.errors.email.message}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -189,21 +180,20 @@ const Auth = ({ onLogin }) => {
                 </label>
                 <input
                   type="password"
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
+                  {...loginForm.register("senha")}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="••••••••"
-                  required
                 />
+                {loginForm.formState.errors.senha && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {loginForm.formState.errors.senha.message}
+                  </p>
+                )}
               </div>
               <div className="text-right">
                 <button
                   type="button"
-                  onClick={() => {
-                    setModo("reset");
-                    setErro("");
-                    setSucesso("");
-                  }}
+                  onClick={() => setModo("reset")}
                   className="text-sm text-purple-600 hover:text-purple-700"
                 >
                   Esqueceu a senha?
@@ -219,19 +209,25 @@ const Auth = ({ onLogin }) => {
           )}
 
           {modo === "registro" && (
-            <form onSubmit={handleRegistro} className="space-y-4">
+            <form
+              onSubmit={registerForm.handleSubmit(onRegisterHandler)}
+              className="space-y-4"
+            >
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   E-mail
                 </label>
                 <input
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  {...registerForm.register("email")}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="seu@email.com"
-                  required
                 />
+                {registerForm.formState.errors.email && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {registerForm.formState.errors.email.message}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -239,12 +235,15 @@ const Auth = ({ onLogin }) => {
                 </label>
                 <input
                   type="password"
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
+                  {...registerForm.register("senha")}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="Mínimo 6 caracteres"
-                  required
                 />
+                {registerForm.formState.errors.senha && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {registerForm.formState.errors.senha.message}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -252,12 +251,15 @@ const Auth = ({ onLogin }) => {
                 </label>
                 <input
                   type="password"
-                  value={confirmarSenha}
-                  onChange={(e) => setConfirmarSenha(e.target.value)}
+                  {...registerForm.register("confirmarSenha")}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="Digite a senha novamente"
-                  required
                 />
+                {registerForm.formState.errors.confirmarSenha && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {registerForm.formState.errors.confirmarSenha.message}
+                  </p>
+                )}
               </div>
               <button
                 type="submit"
@@ -269,18 +271,19 @@ const Auth = ({ onLogin }) => {
           )}
 
           {modo === "reset" && (
-            <form onSubmit={handleReset} className="space-y-4">
+            <form
+              onSubmit={resetForm.handleSubmit(onResetHandler)}
+              className="space-y-4"
+            >
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   E-mail
                 </label>
                 <input
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  {...resetForm.register("email")}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   placeholder="seu@email.com"
-                  required
                 />
                 <p className="text-sm text-gray-500 mt-2">
                   Enviaremos instruções para recuperar sua senha
@@ -294,11 +297,7 @@ const Auth = ({ onLogin }) => {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setModo("login");
-                  setErro("");
-                  setSucesso("");
-                }}
+                onClick={() => setModo("login")}
                 className="w-full text-purple-600 hover:text-purple-700 font-medium"
               >
                 Voltar ao Login
