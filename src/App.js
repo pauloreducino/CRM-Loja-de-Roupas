@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
+import Auth from "./components/Auth";
 
 import Header from "./components/UI/Header";
 import NavigationBar from "./components/UI/NavigationBar";
@@ -21,6 +22,22 @@ import {
 
 // --- COMPONENTE PRINCIPAL (CÉREBRO) ---
 const CRMLoja = () => {
+  // Estado de autenticação
+  const [usuarioLogado, setUsuarioLogado] = useState(
+    () => JSON.parse(localStorage.getItem("crm_usuario_logado")) || null
+  );
+
+  const handleLogin = (usuario) => {
+    setUsuarioLogado(usuario);
+  };
+
+  const handleLogout = () => {
+    if (window.confirm("Deseja realmente sair do sistema?")) {
+      localStorage.removeItem("crm_usuario_logado");
+      setUsuarioLogado(null);
+    }
+  };
+
   const [activeTab, setActiveTab] = useState("clientes");
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState("");
@@ -354,10 +371,15 @@ const CRMLoja = () => {
   const getClienteNome = (id) =>
     clientes.find((c) => c.id === Number(id))?.nome || "Cliente não encontrado";
 
+  // Verifica se usuário está logado
+  if (!usuarioLogado) {
+    return <Auth onLogin={handleLogin} />;
+  }
+
   // --- RENDERIZAÇÃO ---
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
-      <Header />
+      <Header onLogout={handleLogout} />
       <NavigationBar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <main className="max-w-7xl mx-auto p-4 md:p-6">
@@ -446,7 +468,7 @@ const CRMLoja = () => {
         </div>
       )}
 
-      {/* --- LOGO ABAIXO DE TODO CONTEÚDO --- */}
+      {/* Logo abaixo de todo conteúdo */}
       <div className="w-full flex justify-center items-center mt-10 px-4 pb-10">
         <div className="w-full max-w-3xl">
           <img
