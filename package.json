@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "lucide-react": "^0.263.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.63.0",
     "react-scripts": "5.0.1",
-    "lucide-react": "^0.263.1"
+    "zod": "^4.1.11"
   },
   "scripts": {
     "start": "react-scripts start",
