@@ -104,7 +104,6 @@ const CRMLoja = () => {
   const tipoRegra = watchRegra("tipo", "aniversario");
 
   // --- EFEITOS (LÓGICA) ---
-
   useEffect(() => {
     localStorage.setItem("crm_clientes", JSON.stringify(clientes));
   }, [clientes]);
@@ -238,7 +237,6 @@ const CRMLoja = () => {
   }, [gerarTarefasAutomaticas]);
 
   // --- FUNÇÕES DE MANIPULAÇÃO ---
-
   const openModal = (type, item = null) => {
     setModalType(type);
     setEditingItem(item);
@@ -287,7 +285,6 @@ const CRMLoja = () => {
           c.id === editingItem.id ? { ...data, id: editingItem.id } : c
         )
       );
-      // Atualiza o nome do cliente em todas as tarefas relacionadas
       setTarefas(
         tarefas.map((t) =>
           t.clienteId === editingItem.id
@@ -448,6 +445,17 @@ const CRMLoja = () => {
           </div>
         </div>
       )}
+
+      {/* --- LOGO ABAIXO DE TODO CONTEÚDO --- */}
+      <div className="w-full flex justify-center items-center mt-10 px-4 pb-10">
+        <div className="w-full max-w-3xl">
+          <img
+            src="/logo-loja.png"
+            alt="Logo da Loja de Roupas"
+            className="w-full max-w-3xl h-auto object-contain rounded-lg shadow-md opacity-50"
+          />
+        </div>
+      </div>
     </div>
   );
 };
