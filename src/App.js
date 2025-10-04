@@ -3,26 +3,25 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 
-// CORREÇÃO: Adicionando a extensão .js e o caminho relativo correto
-import Header from "./components/UI/Header.js";
-import NavigationBar from "./components/UI/NavigationBar.js";
-import ClienteForm from "./components/Forms/ClienteForm.js";
-import VendaForm from "./components/Forms/VendaForm.js";
-import RegraForm from "./components/Forms/RegraForm.js";
-import ClientesTab from "./components/Tabs/ClientesTab.js";
-import VendasTab from "./components/Tabs/VendasTab.js";
-import TarefasTab from "./components/Tabs/TarefasTab.js";
-import AutomacaoTab from "./components/Tabs/AutomacaoTab.js";
+import Header from "./components/UI/Header";
+import NavigationBar from "./components/UI/NavigationBar";
+import ClienteForm from "./components/Forms/ClienteForm";
+import VendaForm from "./components/Forms/VendaForm";
+import RegraForm from "./components/Forms/RegraForm";
+import ClientesTab from "./components/Tabs/ClientesTab";
+import VendasTab from "./components/Tabs/VendasTab";
+import TarefasTab from "./components/Tabs/TarefasTab";
+import AutomacaoTab from "./components/Tabs/AutomacaoTab";
+
 import {
   clienteSchema,
   vendaSchema,
   regraSchema,
-} from "./schemas/validationSchemas.js";
+} from "./schemas/validationSchemas";
 
 // --- COMPONENTE PRINCIPAL (CÉREBRO) ---
 const CRMLoja = () => {
   const [activeTab, setActiveTab] = useState("clientes");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState("");
   const [editingItem, setEditingItem] = useState(null);
@@ -282,23 +281,13 @@ const CRMLoja = () => {
   const closeModal = () => setShowModal(false);
 
   const saveCliente = (data) => {
-    if (editingItem) {
+    if (editingItem)
       setClientes(
         clientes.map((c) =>
           c.id === editingItem.id ? { ...data, id: editingItem.id } : c
         )
       );
-      setTarefas(
-        tarefas.map((t) => {
-          if (t.clienteId === editingItem.id) {
-            return { ...t, clienteNome: data.nome, telefone: data.telefone };
-          }
-          return t;
-        })
-      );
-    } else {
-      setClientes([...clientes, { ...data, id: Date.now() }]);
-    }
+    else setClientes([...clientes, { ...data, id: Date.now() }]);
     closeModal();
   };
 
@@ -360,23 +349,11 @@ const CRMLoja = () => {
   const getClienteNome = (id) =>
     clientes.find((c) => c.id === Number(id))?.nome || "Cliente não encontrado";
 
-  const handleNavClick = (tabId) => {
-    setActiveTab(tabId);
-    setIsMenuOpen(false);
-  };
-
   // --- RENDERIZAÇÃO ---
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
-      <Header
-        isMenuOpen={isMenuOpen}
-        toggleMenu={() => setIsMenuOpen(!isMenuOpen)}
-      />
-      <NavigationBar
-        activeTab={activeTab}
-        onTabClick={handleNavClick}
-        isMenuOpen={isMenuOpen}
-      />
+      <Header />
+      <NavigationBar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <main className="max-w-7xl mx-auto p-4 md:p-6">
         {activeTab === "clientes" && (
