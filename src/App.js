@@ -450,7 +450,7 @@ const CRMLoja = () => {
       <div className="w-full flex justify-center items-center mt-10 px-4 pb-10">
         <div className="w-full max-w-3xl">
           <img
-            src="/logo-loja.png"
+            src="/logo-loja.webp"
             alt="Logo da Loja de Roupas"
             className="w-full max-w-3xl h-auto object-contain rounded-lg shadow-md opacity-50"
           />
