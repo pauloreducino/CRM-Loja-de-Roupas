@@ -137,7 +137,10 @@ const CRMLoja = () => {
   const gerarTarefasAutomaticas = useCallback(() => {
     const novasTarefas = [];
     const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
     clientes.forEach((cliente) => {
+      // === TAREFAS DE ANIVERSÁRIO ===
       if (cliente.dataNascimento) {
         const [, mes, dia] = cliente.dataNascimento.split("-");
         const aniversarioEsteAno = new Date(
@@ -145,21 +148,23 @@ const CRMLoja = () => {
           parseInt(mes) - 1,
           parseInt(dia)
         );
-        if (aniversarioEsteAno < hoje)
-          aniversarioEsteAno.setFullYear(hoje.getFullYear() + 1);
+        aniversarioEsteAno.setHours(0, 0, 0, 0);
+
         regrasAutomacao
           .filter((r) => r.tipo === "aniversario" && r.ativo)
           .forEach((regra) => {
             const dataExecucao = new Date(aniversarioEsteAno);
             dataExecucao.setDate(dataExecucao.getDate() - regra.diasAntes);
             const dataExecucaoStr = dataExecucao.toISOString().split("T")[0];
+
             const tarefaExistente = tarefas.find(
               (t) =>
                 t.clienteId === cliente.id &&
                 t.tipo === regra.tipo &&
                 t.dataExecucao === dataExecucaoStr
             );
-            if (!tarefaExistente)
+
+            if (!tarefaExistente) {
               novasTarefas.push({
                 id: Date.now() + Math.random(),
                 clienteId: cliente.id,
@@ -170,11 +175,52 @@ const CRMLoja = () => {
                 concluida: false,
                 telefone: cliente.telefone,
               });
+            }
           });
+
+        if (aniversarioEsteAno < hoje) {
+          const aniversarioProximoAno = new Date(
+            hoje.getFullYear() + 1,
+            parseInt(mes) - 1,
+            parseInt(dia)
+          );
+          aniversarioProximoAno.setHours(0, 0, 0, 0);
+
+          regrasAutomacao
+            .filter((r) => r.tipo === "aniversario" && r.ativo)
+            .forEach((regra) => {
+              const dataExecucao = new Date(aniversarioProximoAno);
+              dataExecucao.setDate(dataExecucao.getDate() - regra.diasAntes);
+              const dataExecucaoStr = dataExecucao.toISOString().split("T")[0];
+
+              const tarefaExistente = tarefas.find(
+                (t) =>
+                  t.clienteId === cliente.id &&
+                  t.tipo === regra.tipo &&
+                  t.dataExecucao === dataExecucaoStr
+              );
+
+              if (!tarefaExistente) {
+                novasTarefas.push({
+                  id: Date.now() + Math.random(),
+                  clienteId: cliente.id,
+                  clienteNome: cliente.nome,
+                  tipo: regra.tipo,
+                  mensagem: regra.mensagem.replace("{nome}", cliente.nome),
+                  dataExecucao: dataExecucaoStr,
+                  concluida: false,
+                  telefone: cliente.telefone,
+                });
+              }
+            });
+        }
       }
+
+      // === TAREFAS DE CRÉDITO ===
       const vendasCliente = vendas
         .filter((v) => v.clienteId === cliente.id)
         .sort((a, b) => new Date(b.dataVenda) - new Date(a.dataVenda));
+
       vendasCliente.forEach((venda) => {
         if (venda.credito > 0 && venda.validadeCredito) {
           const regraCredito = regrasAutomacao.find(
@@ -213,6 +259,8 @@ const CRMLoja = () => {
           }
         }
       });
+
+      // === TAREFAS DE INATIVIDADE ===
       const ultimaVenda = vendasCliente[0];
       if (ultimaVenda) {
         const diasSemComprar = Math.floor(
@@ -245,6 +293,7 @@ const CRMLoja = () => {
         }
       }
     });
+
     if (novasTarefas.length > 0)
       setTarefas((prev) => [...prev, ...novasTarefas]);
   }, [clientes, vendas, regrasAutomacao, tarefas, setTarefas]);
