@@ -20,16 +20,12 @@ import {
   regraSchema,
 } from "./schemas/validationSchemas";
 
-// --- COMPONENTE PRINCIPAL (CÉREBRO) ---
 const CRMLoja = () => {
-  // Estado de autenticação
   const [usuarioLogado, setUsuarioLogado] = useState(
     () => JSON.parse(localStorage.getItem("crm_usuario_logado")) || null
   );
 
-  const handleLogin = (usuario) => {
-    setUsuarioLogado(usuario);
-  };
+  const handleLogin = (usuario) => setUsuarioLogado(usuario);
 
   const handleLogout = () => {
     if (window.confirm("Deseja realmente sair do sistema?")) {
@@ -43,7 +39,6 @@ const CRMLoja = () => {
   const [modalType, setModalType] = useState("");
   const [editingItem, setEditingItem] = useState(null);
 
-  // --- ESTADOS DE DADOS (com localStorage) ---
   const [clientes, setClientes] = useState(
     () => JSON.parse(localStorage.getItem("crm_clientes")) || []
   );
@@ -97,19 +92,20 @@ const CRMLoja = () => {
         ];
   });
 
-  // --- CONFIGURAÇÃO DOS FORMULÁRIOS COM REACT-HOOK-FORM E ZOD ---
   const {
     register: registerCliente,
     handleSubmit: handleSubmitCliente,
     formState: { errors: errorsCliente },
     reset: resetCliente,
   } = useForm({ resolver: zodResolver(clienteSchema) });
+
   const {
     register: registerVenda,
     handleSubmit: handleSubmitVenda,
     formState: { errors: errorsVenda },
     reset: resetVenda,
   } = useForm({ resolver: zodResolver(vendaSchema) });
+
   const {
     register: registerRegra,
     handleSubmit: handleSubmitRegra,
@@ -120,19 +116,10 @@ const CRMLoja = () => {
 
   const tipoRegra = watchRegra("tipo", "aniversario");
 
-  // --- EFEITOS (LÓGICA) ---
-  useEffect(() => {
-    localStorage.setItem("crm_clientes", JSON.stringify(clientes));
-  }, [clientes]);
-  useEffect(() => {
-    localStorage.setItem("crm_vendas", JSON.stringify(vendas));
-  }, [vendas]);
-  useEffect(() => {
-    localStorage.setItem("crm_tarefas", JSON.stringify(tarefas));
-  }, [tarefas]);
-  useEffect(() => {
-    localStorage.setItem("crm_regras", JSON.stringify(regrasAutomacao));
-  }, [regrasAutomacao]);
+  useEffect(() => { localStorage.setItem("crm_clientes", JSON.stringify(clientes)); }, [clientes]);
+  useEffect(() => { localStorage.setItem("crm_vendas", JSON.stringify(vendas)); }, [vendas]);
+  useEffect(() => { localStorage.setItem("crm_tarefas", JSON.stringify(tarefas)); }, [tarefas]);
+  useEffect(() => { localStorage.setItem("crm_regras", JSON.stringify(regrasAutomacao)); }, [regrasAutomacao]);
 
   const gerarTarefasAutomaticas = useCallback(() => {
     const novasTarefas = [];
@@ -140,31 +127,42 @@ const CRMLoja = () => {
     hoje.setHours(0, 0, 0, 0);
 
     clientes.forEach((cliente) => {
-      // === TAREFAS DE ANIVERSÁRIO ===
       if (cliente.dataNascimento) {
         const [, mes, dia] = cliente.dataNascimento.split("-");
-        const aniversarioEsteAno = new Date(
-          hoje.getFullYear(),
-          parseInt(mes) - 1,
-          parseInt(dia)
-        );
+        const aniversarioEsteAno = new Date(hoje.getFullYear(), parseInt(mes) - 1, parseInt(dia));
         aniversarioEsteAno.setHours(0, 0, 0, 0);
 
-        regrasAutomacao
-          .filter((r) => r.tipo === "aniversario" && r.ativo)
-          .forEach((regra) => {
-            const dataExecucao = new Date(aniversarioEsteAno);
+        regrasAutomacao.filter((r) => r.tipo === "aniversario" && r.ativo).forEach((regra) => {
+          const dataExecucao = new Date(aniversarioEsteAno);
+          dataExecucao.setDate(dataExecucao.getDate() - regra.diasAntes);
+          const dataExecucaoStr = dataExecucao.toISOString().split("T")[0];
+          const tarefaExistente = tarefas.find(
+            (t) => t.clienteId === cliente.id && t.tipo === regra.tipo && t.dataExecucao === dataExecucaoStr
+          );
+          if (!tarefaExistente)
+            novasTarefas.push({
+              id: Date.now() + Math.random(),
+              clienteId: cliente.id,
+              clienteNome: cliente.nome,
+              tipo: regra.tipo,
+              mensagem: regra.mensagem.replace("{nome}", cliente.nome),
+              dataExecucao: dataExecucaoStr,
+              concluida: false,
+              telefone: cliente.telefone,
+            });
+        });
+
+        if (aniversarioEsteAno < hoje) {
+          const aniversarioProximoAno = new Date(hoje.getFullYear() + 1, parseInt(mes) - 1, parseInt(dia));
+          aniversarioProximoAno.setHours(0, 0, 0, 0);
+          regrasAutomacao.filter((r) => r.tipo === "aniversario" && r.ativo).forEach((regra) => {
+            const dataExecucao = new Date(aniversarioProximoAno);
             dataExecucao.setDate(dataExecucao.getDate() - regra.diasAntes);
             const dataExecucaoStr = dataExecucao.toISOString().split("T")[0];
-
             const tarefaExistente = tarefas.find(
-              (t) =>
-                t.clienteId === cliente.id &&
-                t.tipo === regra.tipo &&
-                t.dataExecucao === dataExecucaoStr
+              (t) => t.clienteId === cliente.id && t.tipo === regra.tipo && t.dataExecucao === dataExecucaoStr
             );
-
-            if (!tarefaExistente) {
+            if (!tarefaExistente)
               novasTarefas.push({
                 id: Date.now() + Math.random(),
                 clienteId: cliente.id,
@@ -175,68 +173,22 @@ const CRMLoja = () => {
                 concluida: false,
                 telefone: cliente.telefone,
               });
-            }
           });
-
-        if (aniversarioEsteAno < hoje) {
-          const aniversarioProximoAno = new Date(
-            hoje.getFullYear() + 1,
-            parseInt(mes) - 1,
-            parseInt(dia)
-          );
-          aniversarioProximoAno.setHours(0, 0, 0, 0);
-
-          regrasAutomacao
-            .filter((r) => r.tipo === "aniversario" && r.ativo)
-            .forEach((regra) => {
-              const dataExecucao = new Date(aniversarioProximoAno);
-              dataExecucao.setDate(dataExecucao.getDate() - regra.diasAntes);
-              const dataExecucaoStr = dataExecucao.toISOString().split("T")[0];
-
-              const tarefaExistente = tarefas.find(
-                (t) =>
-                  t.clienteId === cliente.id &&
-                  t.tipo === regra.tipo &&
-                  t.dataExecucao === dataExecucaoStr
-              );
-
-              if (!tarefaExistente) {
-                novasTarefas.push({
-                  id: Date.now() + Math.random(),
-                  clienteId: cliente.id,
-                  clienteNome: cliente.nome,
-                  tipo: regra.tipo,
-                  mensagem: regra.mensagem.replace("{nome}", cliente.nome),
-                  dataExecucao: dataExecucaoStr,
-                  concluida: false,
-                  telefone: cliente.telefone,
-                });
-              }
-            });
         }
       }
 
-      // === TAREFAS DE CRÉDITO ===
-      const vendasCliente = vendas
-        .filter((v) => v.clienteId === cliente.id)
+      const vendasCliente = vendas.filter((v) => v.clienteId === cliente.id)
         .sort((a, b) => new Date(b.dataVenda) - new Date(a.dataVenda));
 
       vendasCliente.forEach((venda) => {
         if (venda.credito > 0 && venda.validadeCredito) {
-          const regraCredito = regrasAutomacao.find(
-            (r) => r.tipo === "credito" && r.ativo
-          );
+          const regraCredito = regrasAutomacao.find((r) => r.tipo === "credito" && r.ativo);
           if (regraCredito) {
             const dataExpiracao = new Date(venda.validadeCredito);
             const dataLembrete = new Date(dataExpiracao);
-            dataLembrete.setDate(
-              dataLembrete.getDate() - regraCredito.diasAntes
-            );
+            dataLembrete.setDate(dataLembrete.getDate() - regraCredito.diasAntes);
             const tarefaExistente = tarefas.find(
-              (t) =>
-                t.clienteId === cliente.id &&
-                t.tipo === "credito" &&
-                t.vendaId === venda.id
+              (t) => t.clienteId === cliente.id && t.tipo === "credito" && t.vendaId === venda.id
             );
             if (!tarefaExistente && dataLembrete >= hoje)
               novasTarefas.push({
@@ -248,10 +200,7 @@ const CRMLoja = () => {
                 mensagem: regraCredito.mensagem
                   .replace("{nome}", cliente.nome)
                   .replace("{credito}", venda.credito.toFixed(2))
-                  .replace(
-                    "{dataExpiracao}",
-                    new Date(venda.validadeCredito).toLocaleDateString("pt-BR")
-                  ),
+                  .replace("{dataExpiracao}", new Date(venda.validadeCredito).toLocaleDateString("pt-BR")),
                 dataExecucao: dataLembrete.toISOString().split("T")[0],
                 concluida: false,
                 telefone: cliente.telefone,
@@ -260,21 +209,13 @@ const CRMLoja = () => {
         }
       });
 
-      // === TAREFAS DE INATIVIDADE ===
       const ultimaVenda = vendasCliente[0];
       if (ultimaVenda) {
-        const diasSemComprar = Math.floor(
-          (hoje - new Date(ultimaVenda.dataVenda)) / (1000 * 60 * 60 * 24)
-        );
-        const regraInatividade = regrasAutomacao.find(
-          (r) => r.tipo === "inatividade" && r.ativo
-        );
+        const diasSemComprar = Math.floor((hoje - new Date(ultimaVenda.dataVenda)) / (1000 * 60 * 60 * 24));
+        const regraInatividade = regrasAutomacao.find((r) => r.tipo === "inatividade" && r.ativo);
         if (regraInatividade && diasSemComprar >= regraInatividade.diasAntes) {
           const tarefaExistente = tarefas.find(
-            (t) =>
-              t.clienteId === cliente.id &&
-              t.tipo === "inatividade" &&
-              !t.concluida
+            (t) => t.clienteId === cliente.id && t.tipo === "inatividade" && !t.concluida
           );
           if (!tarefaExistente)
             novasTarefas.push({
@@ -282,10 +223,7 @@ const CRMLoja = () => {
               clienteId: cliente.id,
               clienteNome: cliente.nome,
               tipo: "inatividade",
-              mensagem: regraInatividade.mensagem.replace(
-                "{nome}",
-                cliente.nome
-              ),
+              mensagem: regraInatividade.mensagem.replace("{nome}", cliente.nome),
               dataExecucao: hoje.toISOString().split("T")[0],
               concluida: false,
               telefone: cliente.telefone,
@@ -294,51 +232,20 @@ const CRMLoja = () => {
       }
     });
 
-    if (novasTarefas.length > 0)
-      setTarefas((prev) => [...prev, ...novasTarefas]);
+    if (novasTarefas.length > 0) setTarefas((prev) => [...prev, ...novasTarefas]);
   }, [clientes, vendas, regrasAutomacao, tarefas, setTarefas]);
 
-  useEffect(() => {
-    gerarTarefasAutomaticas();
-  }, [gerarTarefasAutomaticas]);
+  useEffect(() => { gerarTarefasAutomaticas(); }, [gerarTarefasAutomaticas]);
 
-  // --- FUNÇÕES DE MANIPULAÇÃO ---
   const openModal = (type, item = null) => {
     setModalType(type);
     setEditingItem(item);
     if (type === "cliente")
-      resetCliente(
-        item || {
-          nome: "",
-          telefone: "",
-          email: "",
-          dataNascimento: "",
-          endereco: "",
-          observacoes: "",
-        }
-      );
+      resetCliente(item || { nome: "", telefone: "", email: "", dataNascimento: "", endereco: "", observacoes: "" });
     else if (type === "venda")
-      resetVenda(
-        item || {
-          clienteId: "",
-          valor: "",
-          descricao: "",
-          dataVenda: new Date().toISOString().split("T")[0],
-          formaPagamento: "dinheiro",
-          credito: 0,
-          validadeCredito: "",
-        }
-      );
+      resetVenda(item || { clienteId: "", valor: "", descricao: "", dataVenda: new Date().toISOString().split("T")[0], formaPagamento: "dinheiro", credito: 0, validadeCredito: "" });
     else if (type === "regra")
-      resetRegra(
-        item || {
-          nome: "",
-          tipo: "aniversario",
-          diasAntes: 7,
-          mensagem: "",
-          ativo: true,
-        }
-      );
+      resetRegra(item || { nome: "", tipo: "aniversario", diasAntes: 7, mensagem: "", ativo: true });
     setShowModal(true);
   };
 
@@ -346,36 +253,22 @@ const CRMLoja = () => {
 
   const saveCliente = (data) => {
     if (editingItem) {
-      setClientes(
-        clientes.map((c) =>
-          c.id === editingItem.id ? { ...data, id: editingItem.id } : c
-        )
-      );
-      setTarefas(
-        tarefas.map((t) =>
-          t.clienteId === editingItem.id
-            ? { ...t, clienteNome: data.nome, telefone: data.telefone }
-            : t
-        )
-      );
+      setClientes(clientes.map((c) => c.id === editingItem.id ? { ...data, id: editingItem.id } : c));
+      setTarefas(tarefas.map((t) => t.clienteId === editingItem.id ? { ...t, clienteNome: data.nome, telefone: data.telefone } : t));
     } else setClientes([...clientes, { ...data, id: Date.now() }]);
     closeModal();
   };
 
   const saveVenda = (data) => {
     const venda = { ...data, id: editingItem?.id || Date.now() };
-    if (editingItem)
-      setVendas(vendas.map((v) => (v.id === editingItem.id ? venda : v)));
+    if (editingItem) setVendas(vendas.map((v) => v.id === editingItem.id ? venda : v));
     else setVendas([...vendas, venda]);
     closeModal();
   };
 
   const saveRegra = (data) => {
     const regra = { ...data, id: editingItem?.id || Date.now() };
-    if (editingItem)
-      setRegrasAutomacao(
-        regrasAutomacao.map((r) => (r.id === editingItem.id ? regra : r))
-      );
+    if (editingItem) setRegrasAutomacao(regrasAutomacao.map((r) => r.id === editingItem.id ? regra : r));
     else setRegrasAutomacao([...regrasAutomacao, regra]);
     closeModal();
   };
@@ -397,137 +290,91 @@ const CRMLoja = () => {
   const enviarWhatsApp = (tarefa) => {
     const mensagem = encodeURIComponent(tarefa.mensagem);
     const telefone = tarefa.telefone.replace(/\D/g, "");
-    window.open(
-      `https://web.whatsapp.com/send?phone=55${telefone}&text=${mensagem}`,
-      "_blank"
-    );
-    setTarefas(
-      tarefas.map((t) => (t.id === tarefa.id ? { ...t, concluida: true } : t))
-    );
+    window.open(`https://web.whatsapp.com/send?phone=55${telefone}&text=${mensagem}`, "_blank");
+    setTarefas(tarefas.map((t) => t.id === tarefa.id ? { ...t, concluida: true } : t));
   };
 
   const getStatusTarefa = (dataExecucao, concluida) => {
-    if (concluida)
-      return { cor: "bg-green-100 text-green-800", texto: "Concluída" };
+    if (concluida) return { cor: "badge badge-success", texto: "Concluída" };
     const hoje = new Date().toISOString().split("T")[0];
-    if (dataExecucao < hoje)
-      return { cor: "bg-red-100 text-red-800", texto: "Atrasada" };
-    if (dataExecucao === hoje)
-      return { cor: "bg-yellow-100 text-yellow-800", texto: "Hoje" };
-    return { cor: "bg-blue-100 text-blue-800", texto: "Futura" };
+    if (dataExecucao < hoje) return { cor: "badge badge-danger", texto: "Atrasada" };
+    if (dataExecucao === hoje) return { cor: "badge badge-warning", texto: "Hoje" };
+    return { cor: "badge badge-info", texto: "Futura" };
   };
 
   const getClienteNome = (id) =>
     clientes.find((c) => c.id === Number(id))?.nome || "Cliente não encontrado";
 
-  // Verifica se usuário está logado
-  if (!usuarioLogado) {
-    return <Auth onLogin={handleLogin} />;
-  }
+  const modalTitles = {
+    cliente: editingItem ? "Editar Cliente" : "Novo Cliente",
+    venda:   editingItem ? "Editar Venda"   : "Nova Venda",
+    regra:   editingItem ? "Editar Regra"   : "Nova Regra",
+  };
 
-  // --- RENDERIZAÇÃO ---
+  if (!usuarioLogado) return <Auth onLogin={handleLogin} />;
+
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
-      <Header onLogout={handleLogout} />
-      <NavigationBar activeTab={activeTab} setActiveTab={setActiveTab} />
+    <>
+      {/* Aurora Background */}
+      <div className="aurora-container">
+        <div className="aurora-orb aurora-orb-1" />
+        <div className="aurora-orb aurora-orb-2" />
+        <div className="aurora-orb aurora-orb-3" />
+      </div>
 
-      <main className="max-w-7xl mx-auto p-4 md:p-6">
-        {activeTab === "clientes" && (
-          <ClientesTab
-            clientes={clientes}
-            openModal={openModal}
-            deleteItem={deleteItem}
-          />
-        )}
-        {activeTab === "vendas" && (
-          <VendasTab
-            vendas={vendas}
-            openModal={openModal}
-            deleteItem={deleteItem}
-            getClienteNome={getClienteNome}
-          />
-        )}
-        {activeTab === "tarefas" && (
-          <TarefasTab
-            tarefas={tarefas}
-            getStatusTarefa={getStatusTarefa}
-            enviarWhatsApp={enviarWhatsApp}
-          />
-        )}
-        {activeTab === "automacao" && (
-          <AutomacaoTab
-            regrasAutomacao={regrasAutomacao}
-            openModal={openModal}
-            deleteItem={deleteItem}
-          />
-        )}
-      </main>
+      <div className="app-layout">
+        <NavigationBar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          onLogout={handleLogout}
+        />
+
+        <div className="app-content">
+          <Header activeTab={activeTab} usuarioLogado={usuarioLogado} />
+
+          <main className="page-content">
+            {activeTab === "clientes" && (
+              <ClientesTab clientes={clientes} openModal={openModal} deleteItem={deleteItem} />
+            )}
+            {activeTab === "vendas" && (
+              <VendasTab vendas={vendas} openModal={openModal} deleteItem={deleteItem} getClienteNome={getClienteNome} />
+            )}
+            {activeTab === "tarefas" && (
+              <TarefasTab tarefas={tarefas} getStatusTarefa={getStatusTarefa} enviarWhatsApp={enviarWhatsApp} />
+            )}
+            {activeTab === "automacao" && (
+              <AutomacaoTab regrasAutomacao={regrasAutomacao} openModal={openModal} deleteItem={deleteItem} />
+            )}
+          </main>
+        </div>
+      </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-4 md:p-6 border-b">
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900">
-                {editingItem ? "Editar" : "Novo"}{" "}
-                {modalType === "cliente"
-                  ? "Cliente"
-                  : modalType === "venda"
-                  ? "Venda"
-                  : "Regra"}
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && closeModal()}>
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2 style={{ fontSize: "18px", fontWeight: "700", color: "var(--text-primary)", letterSpacing: "-0.02em" }}>
+                {modalTitles[modalType]}
               </h2>
-              <button
-                onClick={closeModal}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X size={24} />
+              <button onClick={closeModal} className="btn-icon" style={{ color: "var(--text-muted)" }}>
+                <X size={18} />
               </button>
             </div>
-            <div className="p-4 md:p-6">
+            <div className="modal-body">
               {modalType === "cliente" && (
-                <ClienteForm
-                  onSave={saveCliente}
-                  closeModal={closeModal}
-                  register={registerCliente}
-                  handleSubmit={handleSubmitCliente}
-                  errors={errorsCliente}
-                />
+                <ClienteForm onSave={saveCliente} closeModal={closeModal} register={registerCliente} handleSubmit={handleSubmitCliente} errors={errorsCliente} />
               )}
               {modalType === "venda" && (
-                <VendaForm
-                  onSave={saveVenda}
-                  closeModal={closeModal}
-                  register={registerVenda}
-                  handleSubmit={handleSubmitVenda}
-                  errors={errorsVenda}
-                  clientes={clientes}
-                />
+                <VendaForm onSave={saveVenda} closeModal={closeModal} register={registerVenda} handleSubmit={handleSubmitVenda} errors={errorsVenda} clientes={clientes} />
               )}
               {modalType === "regra" && (
-                <RegraForm
-                  onSave={saveRegra}
-                  closeModal={closeModal}
-                  register={registerRegra}
-                  handleSubmit={handleSubmitRegra}
-                  errors={errorsRegra}
-                  tipoRegra={tipoRegra}
-                />
+                <RegraForm onSave={saveRegra} closeModal={closeModal} register={registerRegra} handleSubmit={handleSubmitRegra} errors={errorsRegra} tipoRegra={tipoRegra} />
               )}
             </div>
           </div>
         </div>
       )}
-
-      {/* Logo abaixo de todo conteúdo */}
-      <div className="w-full flex justify-center items-center mt-10 px-4 pb-10">
-        <div className="w-full max-w-3xl">
-          <img
-            src="/logo-loja.webp"
-            alt="Logo da Loja de Roupas"
-            className="w-full max-w-3xl h-auto object-contain rounded-lg shadow-md opacity-50"
-          />
-        </div>
-      </div>
-    </div>
+    </>
   );
 };
 

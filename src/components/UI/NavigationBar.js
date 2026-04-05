@@ -1,32 +1,64 @@
-import React from "react";
-import { Users, ShoppingCart, CheckSquare, Settings } from "lucide-react";
+import { Users, ShoppingCart, CheckSquare, Settings, LogOut, Store } from "lucide-react";
 
-const NavigationBar = ({ activeTab, setActiveTab }) => (
-  <div className="bg-white shadow-md sticky top-0 z-40">
-    <div className="max-w-7xl mx-auto px-2 sm:px-4">
-      <div className="flex justify-around md:justify-start md:space-x-8">
-        {[
-          { id: "clientes", label: "Clientes", icon: Users },
-          { id: "vendas", label: "Vendas", icon: ShoppingCart },
-          { id: "tarefas", label: "Tarefas", icon: CheckSquare },
-          { id: "automacao", label: "Automação", icon: Settings },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center justify-center flex-1 md:flex-initial space-x-2 py-3 md:py-4 px-2 border-b-2 font-medium transition-colors text-sm ${
-              activeTab === tab.id
-                ? "border-purple-600 text-purple-600"
-                : "border-transparent text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            <tab.icon size={20} />
-            <span className="hidden md:inline">{tab.label}</span>
-          </button>
-        ))}
+const tabs = [
+  { id: "clientes",  label: "Clientes",  icon: Users         },
+  { id: "vendas",    label: "Vendas",    icon: ShoppingCart  },
+  { id: "tarefas",   label: "Tarefas",   icon: CheckSquare   },
+  { id: "automacao", label: "Automação", icon: Settings      },
+];
+
+const NavigationBar = ({ activeTab, setActiveTab, onLogout }) => (
+  <nav className="sidebar">
+    {/* Logo */}
+    <div className="sidebar-logo">
+      <div style={{ display: "flex", alignItems: "center", gap: "11px" }}>
+        <div style={{
+          width: "36px", height: "36px",
+          background: "linear-gradient(135deg, #7c3aed, #06b6d4)",
+          borderRadius: "10px",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          flexShrink: 0,
+          boxShadow: "0 4px 14px rgba(124,58,237,0.4)",
+        }}>
+          <Store size={18} color="white" />
+        </div>
+        <div>
+          <div style={{ fontSize: "14px", fontWeight: "700", color: "var(--text-primary)", lineHeight: 1.25, letterSpacing: "-0.02em" }}>
+            CRM Roupas
+          </div>
+          <div style={{ fontSize: "11px", color: "var(--text-muted)", lineHeight: 1.25 }}>
+            Gestão de Clientes
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+
+    {/* Nav Items */}
+    <div className="sidebar-nav">
+      {tabs.map(({ id, label, icon: Icon }) => (
+        <button
+          key={id}
+          onClick={() => setActiveTab(id)}
+          className={`sidebar-nav-item${activeTab === id ? " active" : ""}`}
+        >
+          <Icon size={17} />
+          <span>{label}</span>
+        </button>
+      ))}
+    </div>
+
+    {/* Logout */}
+    <div className="sidebar-footer">
+      <button
+        onClick={onLogout}
+        className="sidebar-nav-item"
+        style={{ color: "var(--danger)" }}
+      >
+        <LogOut size={17} />
+        <span>Sair</span>
+      </button>
+    </div>
+  </nav>
 );
 
 export default NavigationBar;
